@@ -40,6 +40,21 @@ CharType GetCharTypeFromChar(char c) {
     return None;
 }
 
+
+TokenType getOperatorFromBufferLookAhead(char* buffer, int* it) {
+    printf("Look Ahead: ");
+    // Will Search Until Alphanumeric Character Is Found
+    int i = *it;
+    size_t size = strlen(buffer);
+    while (i+1 < size && !isalnum(buffer[i]) && !isspace(buffer[i])) {
+        printf("%c", buffer[i]);
+        i++;
+    }
+    printf("\n");
+    return TT_None;
+}
+
+
 Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) {
     *allocatedCount = 256;
     Token* array = malloc(sizeof(Token) * (*allocatedCount));
@@ -47,8 +62,25 @@ Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) 
     CharType lastReadType = GetCharTypeFromChar(buffer[0]);
     Token tok;
     int startPos = 0;
+    // Fixme: if end of token is at end of file, parser will ignore, make sure the token is appended
     for (int i = 0; i < strlen(buffer); i++) {
-        if (buffer[i] == '\"') {
+        /*if (buffer[i] == '\"') {
+            //continue;
+        }*/
+
+        // split on characters
+        if (!isalnum(buffer[i]) && buffer[i] != '\n') {
+            getOperatorFromBufferLookAhead(buffer, &i);
+
+            tok.str = buffer+startPos;
+            tok.strSize = ((i)-startPos);
+
+            if (tok.strSize > 0 && !(tok.strSize == 1 && isspace(tok.str[0])))
+                array[(*tokenCount)++] = tok;
+
+
+            lastReadType = GetCharTypeFromChar(buffer[i]);
+            startPos = i;
             continue;
         }
 
@@ -64,19 +96,12 @@ Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) 
             continue;
         }
 
-        // split on characters
-        if (!isalnum(buffer[i]) && (i > 0 && buffer[i] != buffer[i-1])) {
-            tok.str = buffer+startPos;
-            tok.strSize = ((i)-startPos);
 
-            if (tok.strSize > 0 && !(tok.strSize == 1 && isspace(tok.str[0])))
-                array[(*tokenCount)++] = tok;
-
-
-            continue;
-        }
 
     }
+    tok.str = buffer+startPos;
+    tok.strSize = (-startPos);
+    array[(*tokenCount)++] = tok;
 
     return array;
 }

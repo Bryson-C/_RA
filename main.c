@@ -16,7 +16,7 @@
 int main(void) {
 
     size_t fileSize = 0;
-    char* fileBuffer = ReadFile("Lang/Main.rp", &fileSize);
+    char* fileBuffer = ReadFile("Lang/Main.ra", &fileSize);
 
 #ifdef TEST_EDITOR
     Editor editor = LaunchEditor();

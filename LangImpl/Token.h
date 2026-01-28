@@ -15,6 +15,8 @@ typedef enum {
     TT_None,
     TT_UserToken,
     TT_StringLit,
+
+    TT_OP_EQ,
 } TokenType;
 
 typedef struct {
