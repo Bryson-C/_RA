@@ -40,7 +40,6 @@ CharType GetCharTypeFromChar(char c) {
     return None;
 }
 
-
 Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) {
     *allocatedCount = 256;
     Token* array = malloc(sizeof(Token) * (*allocatedCount));
@@ -49,38 +48,11 @@ Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) 
     Token tok;
     int startPos = 0;
     for (int i = 0; i < strlen(buffer); i++) {
-        // split on spaces
-        if (isspace(buffer[i]) || i+1 >= strlen(buffer)) {
-            tok.str = buffer+startPos;
-
-            // END OF FILE CASE
-            if (i+1 >= strlen(buffer)) tok.strSize = (i+1)-startPos;
-            // STANDARD CASE
-            else tok.strSize = ((i)-startPos);
-
-            if (tok.strSize > 0 && !(tok.strSize == 1 && isspace(tok.str[0])))
-                array[(*tokenCount)++] = tok;
-
-
-
-            lastReadType = GetCharTypeFromChar(buffer[i]);
-            startPos = i;
-            continue;
-        }
-
         if (buffer[i] == '\"') {
-            tok.str = buffer+startPos;
-            tok.strSize = ((i)-startPos);
+            continue;
+        }
 
-            if (tok.strSize > 0 && !(tok.strSize == 1 && isspace(tok.str[0])))
-                array[(*tokenCount)++] = tok;
-
-            startPos = i+1;
-            i++;
-
-            while (buffer[i] != '\"') { i++; }
-
-            tok.type = TT_StringLit;
+        if (lastReadType != GetCharTypeFromChar(buffer[i]) || buffer[i] == '\n') {
             tok.str = buffer+startPos;
             tok.strSize = ((i)-startPos);
 
@@ -92,19 +64,8 @@ Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) 
             continue;
         }
 
-        if (lastReadType != GetCharTypeFromChar(buffer[i])) {
-            tok.str = buffer+startPos;
-            tok.strSize = ((i)-startPos);
-
-            if (tok.strSize > 0 && !(tok.strSize == 1 && isspace(tok.str[0])))
-                array[(*tokenCount)++] = tok;
-
-            lastReadType = GetCharTypeFromChar(buffer[i]);
-            startPos = i;
-            continue;
-        }
         // split on characters
-        if (!isalnum(buffer[i])) {
+        if (!isalnum(buffer[i]) && (i > 0 && buffer[i] != buffer[i-1])) {
             tok.str = buffer+startPos;
             tok.strSize = ((i)-startPos);
 
@@ -114,6 +75,7 @@ Token* TokenizeString(char* buffer, size_t* allocatedCount, size_t* tokenCount) 
 
             continue;
         }
+
     }
 
     return array;

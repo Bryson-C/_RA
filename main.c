@@ -11,12 +11,12 @@
 #include "LangImpl/FileSystem.h"
 
 
-
+// WHAT UP GANG!
 
 int main(void) {
 
     size_t fileSize = 0;
-    char* fileBuffer = ReadFile("Lang/Main.lang", &fileSize);
+    char* fileBuffer = ReadFile("Lang/Main.rp", &fileSize);
 
 #ifdef TEST_EDITOR
     Editor editor = LaunchEditor();
